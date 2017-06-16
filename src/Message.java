@@ -30,7 +30,7 @@ public class Message {
 
 
     public Message(int numberOfCommand, String substr1, String substr2){
-
+        // TODO переделать на enum
         switch (numberOfCommand){
             case 100:{
                 //От клиента к серверу команда пытаюсь залогиниться
