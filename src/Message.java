@@ -329,6 +329,7 @@ public class Message {
     public Message(int numberOfCommand, ArrayList<String> list){
         switch (numberOfCommand){
             case 201:
+                //исходящее сообщение от процессора со списком игр
                 this.numberOfCommand = 201;
                 this.listOfGame = list;
                 break;

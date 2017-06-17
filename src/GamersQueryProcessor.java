@@ -17,6 +17,7 @@ public class GamersQueryProcessor {
     }
     public void disconnectTheGamer(ServerGamer gamer){
         server.deleteFromConnectedGamers(gamer);
+        server.tryDisconnectFromLobby(gamer);
     }
     public boolean isLoginConnected(String login){
         return server.isConnected(login);
@@ -26,9 +27,7 @@ public class GamersQueryProcessor {
 
         handleMessageToLobby(new Message(107, "В лобби подключился новый игрок - " + gamer.getLogin(),""));
         ArrayList<String> list = server.getListOfGame();
-        if (!list.isEmpty()) {
-            gamer.handleMessage(new Message(201, list));
-        }
+        gamer.handleMessage(new Message(201, list));
     }
     public void handleMessageToLobby(Message message){
         server.getLobby().sendMessageToLobby(message);

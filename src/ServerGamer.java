@@ -101,8 +101,6 @@ public class ServerGamer {
                 //запрос на подключение к игре с указанным ID
                 if(processor.handleTryToConnectToGame(this, message.getGameID())){
                     //удалось подключиться, значит пользователь уже удален из лобби, необходимо послать всем в чат уведомление об этом
-                    processor.handleMessageToLobby(new Message(107, "Отключился игрок - " + login,""));
-                    //Message tmpmessage = new Message(114, game.getGamer1().getLogin(), "" + game.getObserverCount());
                     Message tmpmessage = new Message(114, game.toString2(),"");
                     sender.sendMessage(tmpmessage);
                     game.getGamer1().sender.sendMessage(new Message(117,login,""));
@@ -214,12 +212,6 @@ public class ServerGamer {
 
                 //запрос на подключение к игре с указанным ID
                 if(processor.handleTryToConnectToGameObs(this, message.getGameID())){
-                    // удалось подключиться, значит пользователь уже удален из лобби, необходимо послать всем в чат уведомление об этом
-                    processor.handleMessageToLobby(new Message(107, "Отключился игрок - " + login,""));
-                    // Message tmpmessage = new Message(114, game.getGamer1().getLogin(), "" + game.getObserverCount());
-//                    Message tmpmessage = new Message(142, game.toString2(),"");
-//                    sender.sendMessage(tmpmessage);
-
                     game.sendMessage(new Message(140,"Obs connected: " + login + "", ""));
                 }else{
                     sender.sendMessage(new Message(140,"Error",""));
@@ -306,8 +298,9 @@ public class ServerGamer {
         return login;
     }
     public void handleDisconnect(){
-        if(!isAnonim)
+        if(!isAnonim) {
             processor.disconnectTheGamer(this);
+        }
 
         if(game != null)
             handleMessage(new Message(150, "", ""));

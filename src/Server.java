@@ -48,6 +48,7 @@ public class Server {
     }
     public void createGame(ServerGamer gamer1){
         allGames.createGame(gamer1);
+        tryDisconnectFromLobby(gamer1);
     }
     public ArrayList<String> getListOfGame(){
         return allGames.getStringListOfGame();
@@ -55,7 +56,6 @@ public class Server {
     public boolean tryToConnectToGame(ServerGamer gamer2, int id){
         boolean answer = allGames.tryToConnect(gamer2, id);
         if(answer){
-            //TODO убрать из лобби
             //отправить первому игроку сообщение о том что к нему подключился игрок
             tryDisconnectFromLobby(gamer2);
         }
@@ -66,14 +66,16 @@ public class Server {
     public boolean tryToCoonectToGameObs(ServerGamer gamer, int id){
         boolean answer = allGames.tryToConnectObs(gamer, id);
 
-        //TODO убрать из лобби
-        if(answer)
+        if(answer) {
             tryDisconnectFromLobby(gamer);
+        }
 
         return answer;
     }
     public boolean tryDisconnectFromLobby(ServerGamer gamer){
         boolean answer = lobby.removeGamer(gamer);
+        if (answer)
+            lobby.sendMessageToLobby(new Message (107, gamer.getLogin() + " вышел из лобби",""));
         return answer;
     }
     public void deleteGame(Game game){
