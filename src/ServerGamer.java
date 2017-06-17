@@ -268,7 +268,11 @@ public class ServerGamer {
                 sender.sendMessage(message);
 
                 // если мы не хостовый игрок то отключаемся от игры и затираем ссылку на игру
-                if(!login.equals(game.getGamer1().getLogin()))
+
+                if (game != null && game.getGamer1().getLogin().equals(login))
+                    processor.deleteGame(game);
+
+                if(game != null && !login.equals(game.getGamer1().getLogin()))
                     game = null;
             }break;
             case 152:{

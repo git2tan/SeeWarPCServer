@@ -31,10 +31,8 @@ public class GamerReceiver implements Runnable{
                     {
                         if(message.getNumberOfCommand() == 300)
                         {
-                            gamer.handleMessage(message);
                             System.err.println("ПОЛУЧИЛ СООБЩЕНИЕ ОБ ОТКЛЮЧЕНИИ ОТ: " + gamer.getLogin());
-
-                            // завершаем поток?
+                            gamer.handleMessage(message);
                             break;
                         }
                         else
