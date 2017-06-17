@@ -256,7 +256,7 @@ public class ServerGamer {
             case 150:{
                 // к->c ручной дисконнект от игры
                 if (game != null)
-                    game.armDisconnect(this);
+                    game.handleDisconnect(this);
 
                 if (game != null && game.getGamer1().getLogin().equals(login))
                     processor.deleteGame(game);
