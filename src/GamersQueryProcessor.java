@@ -23,9 +23,9 @@ public class GamersQueryProcessor {
         return server.isConnected(login);
     }
     public void handleConnectToLobby(ServerGamer gamer){
-        server.connectToLobby(gamer);
+        if (server.connectToLobby(gamer))
+            handleMessageToLobby(new Message(107, "В лобби подключился новый игрок - " + gamer.getLogin(),""));
 
-        handleMessageToLobby(new Message(107, "В лобби подключился новый игрок - " + gamer.getLogin(),""));
         ArrayList<String> list = server.getListOfGame();
         gamer.handleMessage(new Message(201, list));
     }

@@ -40,8 +40,8 @@ public class Server {
         }
         return isConnected;
     }
-    public void connectToLobby(ServerGamer gamer){
-        lobby.addGamer(gamer);
+    public boolean connectToLobby(ServerGamer gamer){
+        return lobby.addGamer(gamer);
     }
     public Lobby getLobby(){
         return lobby;

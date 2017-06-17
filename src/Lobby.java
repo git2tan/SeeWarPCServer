@@ -13,9 +13,14 @@ public class Lobby {
             one.handleMessage(message);
         }
     }
-    public void addGamer(ServerGamer gamer){
-        if(!gamerInLobby.contains(gamer))
+    public boolean addGamer(ServerGamer gamer){
+        if(!gamerInLobby.contains(gamer)){
             gamerInLobby.add(gamer);
+            return true;
+        }
+        else
+            return false;
+
     }
 
     public boolean removeGamer(ServerGamer gamer){
