@@ -323,8 +323,11 @@ public class ServerGamer {
     }
 
     public boolean isHit(int coordX, int coordY){
-        if(board[coordX][coordY] == 1) {
+        if (board[coordX][coordY] == 1) {
             board[coordX][coordY] = 2;
+            return true;
+        }
+        else if (board[coordX][coordY] == 2){
             return true;
         }
         else{
