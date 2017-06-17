@@ -24,14 +24,14 @@ public class GamerReceiver implements Runnable{
             while(true){
                 fromClient = r.readLine();
                 if(fromClient != null){
-                    System.out.println("Получил (" + gamer.getLogin() + "): " + fromClient);//при получении сообщения обращаемся к геймеру с просьбой обработать сообщения
+                    System.out.println(">SERVER<-- " + gamer.getLogin() + " <-- " + fromClient);//при получении сообщения обращаемся к геймеру с просьбой обработать сообщения
                     Message message = decoder.decodeString(fromClient);
 
                     if(!message.isEmpty())
                     {
                         if(message.getNumberOfCommand() == 300)
                         {
-                            System.err.println("ПОЛУЧИЛ СООБЩЕНИЕ ОБ ОТКЛЮЧЕНИИ ОТ: " + gamer.getLogin());
+                            System.out.println("ПОЛУЧИЛ СООБЩЕНИЕ ОБ ОТКЛЮЧЕНИИ ОТ: " + gamer.getLogin());
                             gamer.handleMessage(message);
                             break;
                         }

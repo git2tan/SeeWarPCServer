@@ -44,21 +44,21 @@ public class ServerGamer {
 
                 if (isAnonim){
                     if((processor.handleIsGamerExistInDB(message.getLogin(),message.getPass()) && !(processor.isLoginConnected(message.getLogin())))){
-                        sender.sendMessage(new Message(101,message.getLogin(),message.getPass()));
+                        sendMessage(new Message(101,message.getLogin(),message.getPass()));
                         isAnonim = false;
                         login = message.getLogin();
                         password = message.getPass();
                         processor.connectTheGamer(this);
                     }
                     else
-                        sender.sendMessage(new Message(102,"",""));
+                        sendMessage(new Message(102,"",""));
                 }
 //                else if(message.getLogin().equals(login) && password.equals(message.getPass())){
-//                    sender.sendMessage(new Message(101, login, password));
+//                    sendMessage(new Message(101, login, password));
 //                }
 //                else if (!isAnonim){
 //                    isAnonim = true;
-//                    sender.sendMessage(new Message(102,"",""));
+//                    sendMessage(new Message(102,"",""));
 //                    handleDisconnect();
 //                }
 
@@ -73,7 +73,7 @@ public class ServerGamer {
                 //клиент пытается зайти в лобби
                 processor.handleConnectToLobby(this);
                 //послылаем ответ на запрос входа в лобби (положительный)
-                sender.sendMessage(new Message(104,"",""));
+                sendMessage(new Message(104,"",""));
                 //посылаем всем в лобби сообщение о том что был подключен такой то игрок
                 //processor.handleMessageToLobby(new Message(107, "В лобби подключился новый игрок - " + login,""));
             }break;
@@ -85,18 +85,18 @@ public class ServerGamer {
                 processor.handleMessageToLobby(new Message(106,message.getLogin(),message.getMessage()));
             }break;
             case 106:{
-                sender.sendMessage(message);
+                sendMessage(message);
             }break;
             case 107:{
-                sender.sendMessage(message);
+                sendMessage(message);
             }break;
             case 108:{
                 //запрос от клиента о регистрации нового пользователя
                 if(processor.isLoginExist(message.getLogin())){
-                    sender.sendMessage(new Message(110,"",""));
+                    sendMessage(new Message(110,"",""));
                 }else{
                     processor.registrationNewAccount(message.getLogin(), message.getPass());
-                    sender.sendMessage(new Message(109,message.getLogin(),message.getPass()));
+                    sendMessage(new Message(109,message.getLogin(),message.getPass()));
                 }
             }break;
             case 109:{
@@ -108,7 +108,7 @@ public class ServerGamer {
             case 111:{
                 //запрос на создание игры
                 processor.createGameQueryHandler(this);
-                sender.sendMessage(new Message(112,"",""));
+                sendMessage(new Message(112,"",""));
             }break;
             case 112:{
                 //пропускаем т.к. это положительный ответ от сервера на создание игры (генерится в 111)
@@ -118,10 +118,10 @@ public class ServerGamer {
                 if(processor.handleTryToConnectToGame(this, message.getGameID())){
                     //удалось подключиться, значит пользователь уже удален из лобби, необходимо послать всем в чат уведомление об этом
                     Message tmpmessage = new Message(114, game.toString2(),"");
-                    sender.sendMessage(tmpmessage);
-                    game.getGamer1().sender.sendMessage(new Message(117,login,""));
+                    sendMessage(tmpmessage);
+                    game.getGamer1().sendMessage(new Message(117,login,""));
                 }else{
-                    sender.sendMessage(new Message(115,"",""));
+                    sendMessage(new Message(115,"",""));
                 }
 
             }break;
@@ -132,14 +132,14 @@ public class ServerGamer {
             }break;
             case 117:{
                 //пропускаем т.к.сам сервер его генерит
-                sender.sendMessage(message);
+                sendMessage(message);
             }break;
             case 118:{
                 //должны сами генерировать в 116
-                sender.sendMessage(message);
+                sendMessage(message);
             }break;
             case 119:{
-                sender.sendMessage(message);
+                sendMessage(message);
             }break;
             case 120:{
                 //пришло сообщение что пользователь готов и послал свое игровое поле
@@ -162,51 +162,51 @@ public class ServerGamer {
                 sender .sendMessage(message);
             } break;
             case 124:{
-                sender.sendMessage(message);
+                sendMessage(message);
             } break;
             case 125:{
-                sender.sendMessage(message);
+                sendMessage(message);
             } break;
             case 126:{
                 game.shot(message,this);
             } break;
             case 127:{
-                sender.sendMessage(message);
+                sendMessage(message);
             } break;
             case 128:{
-                sender.sendMessage(message);
+                sendMessage(message);
             } break;
             case 129:{
-                sender.sendMessage(message);
+                sendMessage(message);
             } break;
             case 130:{
-                sender.sendMessage(message);
+                sendMessage(message);
             } break;
             case 131:{
-                sender.sendMessage(message);
+                sendMessage(message);
             } break;
             case 132:{
-                sender.sendMessage(message);
+                sendMessage(message);
             } break;
             case 133:{
                 // обработать выигрыш
                 setWinner();
-                sender.sendMessage(message);
+                sendMessage(message);
             }break;
             case 134:{
                 //обработать проигрыш
                 setLoser();
-                sender.sendMessage(message);
+                sendMessage(message);
             }break;
             case 135:{
-                sender.sendMessage(new Message(136,"",""));
+                sendMessage(new Message(136,"",""));
             }break;
             case 136:{
 
             }break;
             case 137:{
                 //запрос статистики
-                sender.sendMessage(new Message(202, processor.getStatisticHandler(message.getVariableOne())));
+                sendMessage(new Message(202, processor.getStatisticHandler(message.getVariableOne())));
             }break;
             case 138:{
                 // сообщение от клиента серверу в чат игры
@@ -214,11 +214,11 @@ public class ServerGamer {
             }break;
             case 139:{
                 // сообщение от сервера клиенту в чат игры
-                sender.sendMessage(message);
+                sendMessage(message);
             }break;
             case 140:{
                 // служебное сообщение в чат игры (от сервера)
-                sender.sendMessage(message);
+                sendMessage(message);
             }break;
             case 141:{
                 // сообщение о намерении подключиться к игре в качестве обсервера
@@ -227,28 +227,28 @@ public class ServerGamer {
                 if(processor.handleTryToConnectToGameObs(this, message.getGameID())){
                     game.sendMessage(new Message(140,"Obs connected: " + login + "", ""));
                 }else{
-                    sender.sendMessage(new Message(140,"Error",""));
+                    sendMessage(new Message(140,"Error",""));
                 }
             }break;
             case 142:{
                 // сообщение от сервера о подключении к игре в качестве обсервера
-                sender.sendMessage(message);
+                sendMessage(message);
             }break;
             case 143:{
                 //
-                sender.sendMessage(message);
+                sendMessage(message);
             }break;
             case 144:{
-                sender.sendMessage(message);
+                sendMessage(message);
             }break;
             case 145:{
-                sender.sendMessage(message);
+                sendMessage(message);
             }break;
             case 146:{
-                sender.sendMessage(message);
+                sendMessage(message);
             }break;
             case 147:{
-                sender.sendMessage(message);
+                sendMessage(message);
             }break;
             case 148:{
                 // пришло сообщение о том что игрок пожелал сдаться...
@@ -256,7 +256,7 @@ public class ServerGamer {
             }break;
             case 149:{
                 // пришел запрос на статистику по конкретному игроку
-                sender.sendMessage(new Message(202, processor.getLoginStatisticHandler(message.getLogin())));
+                sendMessage(new Message(202, processor.getLoginStatisticHandler(message.getLogin())));
             }break;
             case 150:{
                 // к->c ручной дисконнект от игры
@@ -272,7 +272,8 @@ public class ServerGamer {
             }break;
             case 151:{
                 // хостовый игрок прервал создание игры
-                sender.sendMessage(message);
+                if (sender != null)
+                sendMessage(message);
 
                 // если мы не хостовый игрок то отключаемся от игры и затираем ссылку на игру
 
@@ -291,19 +292,20 @@ public class ServerGamer {
             }break;
             case 201:{
                 //исходящее сообщение от процессора со списком игр
-                sender.sendMessage(message);
+                sendMessage(message);
             }break;
             case 300:{
                 // сообщение об отключении клиента...
                 if (!isAnonim){
-                    sender.sendMessage(new Message(301,"",""));
+                    sendMessage(new Message(302,"",""));
+                    sender = null;
                     processor.disconnectTheGamer(this);
                     if(game != null){
                         game.handleDisconnect(this);
                     }
                 }
                 else
-                    sender.sendMessage(new Message(301,"",""));
+                    sendMessage(new Message(301,"",""));
             }break;
             case 301:{
                 // исходящее сообщение об отключении
@@ -533,6 +535,11 @@ public class ServerGamer {
             else
                 return false;
         }
+    }
+
+    private void sendMessage(Message message){
+        if (sender != null)
+            sender.sendMessage(message);
     }
 
 }

@@ -25,7 +25,7 @@ public class GamerSender {
 
     public void sendMessage(Message message){
         String tmp = decoder.codeMessage(message);
-        System.out.println("Отправил игроку" + myGamer.getLogin() + ": " + tmp);
+        System.out.println("SERVER --> " + myGamer.getLogin() + " --> " + tmp);
         toServer.println(tmp);
     }
 }
