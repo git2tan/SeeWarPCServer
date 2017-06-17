@@ -29,6 +29,9 @@ public class GamersQueryProcessor {
         ArrayList<String> list = server.getListOfGame();
         gamer.handleMessage(new Message(201, list));
     }
+    public void handleDisconnectFromLobby(ServerGamer gamer){
+        server.tryDisconnectFromLobby(gamer);
+    }
     public void handleMessageToLobby(Message message){
         server.getLobby().sendMessageToLobby(message);
     }

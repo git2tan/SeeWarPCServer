@@ -120,7 +120,7 @@ public class Message {
                 this.numberOfCommand = 115;
             } break;
             case 116:{
-                //отказ от создания игры
+                //покидаем лобби вручную
                 this.numberOfCommand = 116;
             } break;
             case 117:{

@@ -34,18 +34,34 @@ public class ServerGamer {
             case 100 :{
                 //Геймер пытается залогиниться
                 //Проверяем зарегистрирован ли геймер с такими логином и паролем на сервере
-                if((processor.handleIsGamerExistInDB(message.getLogin(),message.getPass()) && !(processor.isLoginConnected(message.getLogin())))){
-                    sender.sendMessage(new Message(101,message.getLogin(),message.getPass()));
-                    isAnonim = false;
-                    login = message.getLogin();
-                    password = message.getPass();
-                    processor.connectTheGamer(this);
+                if(!isAnonim){
+                    if(message.getLogin().equals(login) && password.equals(message.getPass())){
+                        sender.sendMessage(new Message(101, login, password));
+                    }
+                    else
+                        handleDisconnect();
                 }
-                else if(message.getLogin().equals(login) && password.equals(message.getPass())){
-                    sender.sendMessage(new Message(101, login, password));
+
+                if (isAnonim){
+                    if((processor.handleIsGamerExistInDB(message.getLogin(),message.getPass()) && !(processor.isLoginConnected(message.getLogin())))){
+                        sender.sendMessage(new Message(101,message.getLogin(),message.getPass()));
+                        isAnonim = false;
+                        login = message.getLogin();
+                        password = message.getPass();
+                        processor.connectTheGamer(this);
+                    }
+                    else
+                        sender.sendMessage(new Message(102,"",""));
                 }
-                else
-                    sender.sendMessage(new Message(102,"",""));
+//                else if(message.getLogin().equals(login) && password.equals(message.getPass())){
+//                    sender.sendMessage(new Message(101, login, password));
+//                }
+//                else if (!isAnonim){
+//                    isAnonim = true;
+//                    sender.sendMessage(new Message(102,"",""));
+//                    handleDisconnect();
+//                }
+
             }break;
             case 101:{
                 //пропускаем так как это только от сервера клиенту может такое приходить
@@ -110,11 +126,8 @@ public class ServerGamer {
 
             }break;
             case 116:{
-                // запрос от игрока на прекращение создания игры
-                // TODO послать всем уведомление о том что игра была прервана
-                game.sendMessage(new Message(118,"",""));
-                // TODO удалить игру
-                // TODO отправить в лобби новый список игр
+                // запрос от игрока на выход из лобби
+                processor.handleDisconnectFromLobby(this);
                 //
             }break;
             case 117:{
@@ -253,6 +266,8 @@ public class ServerGamer {
                 if (game != null && game.getGamer1().getLogin().equals(login))
                     processor.deleteGame(game);
 
+                //
+                processor.handleConnectToLobby(this);
                 game = null;
             }break;
             case 151:{
@@ -272,6 +287,7 @@ public class ServerGamer {
                 if(game != null)
                     game.disconnectObs(this);
                 game = null;
+                processor.handleConnectToLobby(this);
             }break;
             case 201:{
                 //исходящее сообщение от процессора со списком игр
@@ -306,6 +322,9 @@ public class ServerGamer {
             handleMessage(new Message(150, "", ""));
 
         System.err.println("Error:connect is broken. " + (isAnonim ? "Anonim" : login) + " is disconnect from server");
+        login = null;
+        password = null;
+        isAnonim = true;
     }
 
     public void setGame(Game game) {
