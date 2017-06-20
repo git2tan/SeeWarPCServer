@@ -31,12 +31,12 @@ public class ServerGamer {
     public void handleMessage(Message message){
 //        processor.processMessage(this, message);
         switch(message.getNumberOfCommand()){
-            case 100 :{
+            case MessageCommand.C_S_TryLogin :{
                 //Геймер пытается залогиниться
                 //Проверяем зарегистрирован ли геймер с такими логином и паролем на сервере
                 if(!isAnonim){
                     if(message.getLogin().equals(login) && password.equals(message.getPass())){
-                        sender.sendMessage(new Message(101, login, password));
+                        sender.sendMessage(new Message(MessageCommand.S_C_SuccessLogin, login, password));
                     }
                     else
                         handleDisconnect();
@@ -44,221 +44,221 @@ public class ServerGamer {
 
                 if (isAnonim){
                     if((processor.handleIsGamerExistInDB(message.getLogin(),message.getPass()) && !(processor.isLoginConnected(message.getLogin())))){
-                        sendMessage(new Message(101,message.getLogin(),message.getPass()));
+                        sendMessage(new Message(MessageCommand.S_C_SuccessLogin,message.getLogin(),message.getPass()));
                         isAnonim = false;
                         login = message.getLogin();
                         password = message.getPass();
                         processor.connectTheGamer(this);
                     }
                     else
-                        sendMessage(new Message(102,"",""));
+                        sendMessage(new Message(MessageCommand.S_C_InValidLogin,"",""));
                 }
 //                else if(message.getLogin().equals(login) && password.equals(message.getPass())){
-//                    sendMessage(new Message(101, login, password));
+//                    sendMessage(new Message(MessageCommand.S_C_SuccessLogin, login, password));
 //                }
 //                else if (!isAnonim){
 //                    isAnonim = true;
-//                    sendMessage(new Message(102,"",""));
+//                    sendMessage(new Message(MessageCommand.S_C_InValidLogin,"",""));
 //                    handleDisconnect();
 //                }
 
             }break;
-            case 101:{
+            case MessageCommand.S_C_SuccessLogin:{
                 //пропускаем так как это только от сервера клиенту может такое приходить
             }break;
-            case 102:{
+            case MessageCommand.S_C_InValidLogin:{
                 //аналогично
             }break;
-            case 103:{
+            case MessageCommand.C_S_TryConnectToLobby:{
                 //клиент пытается зайти в лобби
                 processor.handleConnectToLobby(this);
                 //послылаем ответ на запрос входа в лобби (положительный)
-                sendMessage(new Message(104,"",""));
+                sendMessage(new Message(MessageCommand.S_C_YouAllowConnectToLobby,"",""));
                 //посылаем всем в лобби сообщение о том что был подключен такой то игрок
-                //processor.handleMessageToLobby(new Message(107, "В лобби подключился новый игрок - " + login,""));
+                //processor.handleMessageToLobby(new Message(MessageCommand.S_C_MessageToLobbyFromServer, "В лобби подключился новый игрок - " + login,""));
             }break;
-            case 104:{
+            case MessageCommand.S_C_YouAllowConnectToLobby:{
                 //пропускаем так как это от сервера клиенту может быть такое сообщение
             }break;
-            case 105:{
+            case MessageCommand.C_S_MessageToLobby:{
                 //сообщение в лобби чат
-                processor.handleMessageToLobby(new Message(106,message.getLogin(),message.getMessage()));
+                processor.handleMessageToLobby(new Message(MessageCommand.S_C_MessageToLobbyFromLogin,message.getLogin(),message.getMessage()));
             }break;
-            case 106:{
+            case MessageCommand.S_C_MessageToLobbyFromLogin:{
                 sendMessage(message);
             }break;
-            case 107:{
+            case MessageCommand.S_C_MessageToLobbyFromServer:{
                 sendMessage(message);
             }break;
-            case 108:{
+            case MessageCommand.C_S_TryToRegisterNewLogin:{
                 //запрос от клиента о регистрации нового пользователя
                 if(processor.isLoginExist(message.getLogin())){
-                    sendMessage(new Message(110,"",""));
+                    sendMessage(new Message(MessageCommand.S_C_RegistrationNotSuccess,"",""));
                 }else{
                     processor.registrationNewAccount(message.getLogin(), message.getPass());
-                    sendMessage(new Message(109,message.getLogin(),message.getPass()));
+                    sendMessage(new Message(MessageCommand.S_C_RegistrationSuccess,message.getLogin(),message.getPass()));
                 }
             }break;
-            case 109:{
+            case MessageCommand.S_C_RegistrationSuccess:{
                 //пропускаем
             }break;
-            case 110:{
+            case MessageCommand.S_C_RegistrationNotSuccess:{
                 //пропускаем
             }break;
-            case 111:{
+            case MessageCommand.C_S_WantToCreateGame:{
                 //запрос на создание игры
                 processor.createGameQueryHandler(this);
-                sendMessage(new Message(112,"",""));
+                sendMessage(new Message(MessageCommand.S_C_AllowToCreateGame,"",""));
             }break;
-            case 112:{
+            case MessageCommand.S_C_AllowToCreateGame:{
                 //пропускаем т.к. это положительный ответ от сервера на создание игры (генерится в 111)
             }break;
-            case 113:{
+            case MessageCommand.C_S_WantToConnectToGame:{
                 //запрос на подключение к игре с указанным ID
                 if(processor.handleTryToConnectToGame(this, message.getGameID())){
                     //удалось подключиться, значит пользователь уже удален из лобби, необходимо послать всем в чат уведомление об этом
-                    Message tmpmessage = new Message(114, game.toString2(),"");
+                    Message tmpmessage = new Message(MessageCommand.S_C_SuccessConnectToGame, game.toString2(),"");
                     sendMessage(tmpmessage);
-                    game.getGamer1().sendMessage(new Message(117,login,""));
+                    game.getGamer1().sendMessage(new Message(MessageCommand.S_C_ToHostGamer_NewGamerConnect,login,""));
                 }else{
-                    sendMessage(new Message(115,"",""));
+                    sendMessage(new Message(MessageCommand.S_C_NotAllowConnectToGame,"",""));
                 }
 
             }break;
-            case 116:{
+            case MessageCommand.C_S_ArmLeftTheLobby:{
                 // запрос от игрока на выход из лобби
                 processor.handleDisconnectFromLobby(this);
                 //
             }break;
-            case 117:{
+            case MessageCommand.S_C_ToHostGamer_NewGamerConnect:{
                 //пропускаем т.к.сам сервер его генерит
                 sendMessage(message);
             }break;
-            case 118:{
-                //должны сами генерировать в 116
+            case MessageCommand.S_C_RequesttoArmDisconnectFromLobby:{
+                //должны сами генерировать
                 sendMessage(message);
             }break;
-            case 119:{
+            case MessageCommand.S_C_NewGameInfo:{
                 sendMessage(message);
             }break;
-            case 120:{
+            case MessageCommand.C_S_GamerReadyAndSendBoard:{
                 //пришло сообщение что пользователь готов и послал свое игровое поле
                 isReady = true;
                 this.board = message.getBoard();
-                game.sendMessage(new Message(119, game.toString2(),""));
+                game.sendMessage(new Message(MessageCommand.S_C_NewGameInfo, game.toString2(),""));
             }break;
-            case 121:{
+            case MessageCommand.C_S_GamerNotReady:{
                 //пришло сообщение от пользователя что он не готов
                 isReady = false;
                 if(game != null)
-                    game.sendMessage(new Message(119, game.toString2(),""));
+                    game.sendMessage(new Message(MessageCommand.S_C_NewGameInfo, game.toString2(),""));
             }break;
-            case 122:{
+            case MessageCommand.C_S_HostGamerStartTheGame:{
                 // пришло сообщение от пользователя что он хочет стартануть игру
                 game.startGame();
             } break;
-            case 123:{
+            case MessageCommand.S_C_ToHostGamerStartTheGame:{
                 //от сервера пришол запрос отправить игроку ответ на старт игры в качестве первого игрока
                 sender .sendMessage(message);
             } break;
-            case 124:{
+            case MessageCommand.S_C_ToGamer2StartTheGame:{
                 sendMessage(message);
             } break;
-            case 125:{
+            case MessageCommand.S_C_AllowObserveTheGame:{
                 sendMessage(message);
             } break;
-            case 126:{
+            case MessageCommand.C_S_FireToCoord:{
                 game.shot(message,this);
             } break;
-            case 127:{
+            case MessageCommand.S_C_YouHitToCoord:{
                 sendMessage(message);
             } break;
-            case 128:{
+            case MessageCommand.S_C_YouMissToCoord:{
                 sendMessage(message);
             } break;
-            case 129:{
+            case MessageCommand.S_C_OpponentHitToYou:{
                 sendMessage(message);
             } break;
-            case 130:{
+            case MessageCommand.S_C_OpponentMissToYou:{
                 sendMessage(message);
             } break;
-            case 131:{
+            case MessageCommand.S_C_YouDestroyTheShipByCoord:{
                 sendMessage(message);
             } break;
-            case 132:{
+            case MessageCommand.S_C_YourShipByCoordIsDestroyed:{
                 sendMessage(message);
             } break;
-            case 133:{
+            case MessageCommand.S_C_YouWin:{
                 // обработать выигрыш
                 setWinner();
                 sendMessage(message);
             }break;
-            case 134:{
+            case MessageCommand.S_C_YouLose:{
                 //обработать проигрыш
                 setLoser();
                 sendMessage(message);
             }break;
-            case 135:{
-                sendMessage(new Message(136,"",""));
+            case MessageCommand.C_S_NeedStatisticFromNumber:{
+                sendMessage(new Message(MessageCommand.S_C_ShowStatActivity,"",""));
             }break;
-            case 136:{
+            case MessageCommand.S_C_ShowStatActivity:{
 
             }break;
-            case 137:{
+            case MessageCommand.C_S_NeedRefreshStatistic:{
                 //запрос статистики
-                sendMessage(new Message(202, processor.getStatisticHandler(message.getVariableOne())));
+                sendMessage(new Message(MessageCommand.S_C_Statistic, processor.getStatisticHandler(message.getVariableOne())));
             }break;
-            case 138:{
+            case MessageCommand.C_S_MessageToLobbyFromlogin:{
                 // сообщение от клиента серверу в чат игры
-                game.sendMessage(new Message(139,message.getLogin(),message.getMessage()));
+                game.sendMessage(new Message(MessageCommand.S_C_MessageToLobbyFromlogin,message.getLogin(),message.getMessage()));
             }break;
-            case 139:{
+            case MessageCommand.S_C_MessageToLobbyFromlogin:{
                 // сообщение от сервера клиенту в чат игры
                 sendMessage(message);
             }break;
-            case 140:{
+            case MessageCommand.S_C_MessageToLobbyAboutCoonect:{
                 // служебное сообщение в чат игры (от сервера)
                 sendMessage(message);
             }break;
-            case 141:{
+            case MessageCommand.C_S_WantToObserverToGame:{
                 // сообщение о намерении подключиться к игре в качестве обсервера
 
                 //запрос на подключение к игре с указанным ID
                 if(processor.handleTryToConnectToGameObs(this, message.getGameID())){
-                    game.sendMessage(new Message(140,"Obs connected: " + login + "", ""));
+                    game.sendMessage(new Message(MessageCommand.S_C_MessageToLobbyAboutCoonect,"Obs connected: " + login + "", ""));
                 }else{
-                    sendMessage(new Message(140,"Error",""));
+                    sendMessage(new Message(MessageCommand.S_C_MessageToLobbyAboutCoonect,"Error",""));
                 }
             }break;
-            case 142:{
+            case MessageCommand.S_C_ShowObserverActivity:{
                 // сообщение от сервера о подключении к игре в качестве обсервера
                 sendMessage(message);
             }break;
-            case 143:{
+            case MessageCommand.S_C_LoginFireToCoordAndHit:{
                 //
                 sendMessage(message);
             }break;
-            case 144:{
+            case MessageCommand.S_C_ToObs_LoginFireToCoordAndMiss:{
                 sendMessage(message);
             }break;
-            case 145:{
+            case MessageCommand.S_C_ToObs_LoginDestroyShipByCoord:{
                 sendMessage(message);
             }break;
-            case 146:{
+            case MessageCommand.S_C_ToObs_LoginWin:{
                 sendMessage(message);
             }break;
-            case 147:{
+            case MessageCommand.S_C_ToObs_ActualGameInfo:{
                 sendMessage(message);
             }break;
-            case 148:{
+            case MessageCommand.C_S_GamerWantToLose:{
                 // пришло сообщение о том что игрок пожелал сдаться...
                 game.handleSurrenderMessage(this);
             }break;
-            case 149:{
+            case MessageCommand.C_S_WantStatAboutlogin:{
                 // пришел запрос на статистику по конкретному игроку
-                sendMessage(new Message(202, processor.getLoginStatisticHandler(message.getLogin())));
+                sendMessage(new Message(MessageCommand.S_C_Statistic, processor.getLoginStatisticHandler(message.getLogin())));
             }break;
-            case 150:{
+            case MessageCommand.C_S_LeftFromTheGame:{
                 // к->c ручной дисконнект от игры
                 if (game != null)
                     game.handleDisconnect(this);
@@ -270,7 +270,7 @@ public class ServerGamer {
                 processor.handleConnectToLobby(this);
                 game = null;
             }break;
-            case 151:{
+            case MessageCommand.S_C_HostLeftTheGame:{
                 // хостовый игрок прервал создание игры
                 if (sender != null)
                 sendMessage(message);
@@ -283,21 +283,21 @@ public class ServerGamer {
                 if(game != null && !login.equals(game.getGamer1().getLogin()))
                     game = null;
             }break;
-            case 152:{
+            case MessageCommand.C_S_StopObserveTheGame:{
                 //пришло сообщение о желании перестать наблюдать за игрой
                 if(game != null)
                     game.disconnectObs(this);
                 game = null;
                 processor.handleConnectToLobby(this);
             }break;
-            case 201:{
+            case MessageCommand.S_C_ListOfLobbyGame:{
                 //исходящее сообщение от процессора со списком игр
                 sendMessage(message);
             }break;
-            case 300:{
+            case MessageCommand.C_S_DisconnectFromServer:{
                 // сообщение об отключении клиента...
                 if (!isAnonim){
-                    sendMessage(new Message(302,"",""));
+                    sendMessage(new Message(MessageCommand.S_C_SystemMessageStopTheThread,"",""));
                     sender = null;
                     processor.disconnectTheGamer(this);
                     if(game != null){
@@ -305,9 +305,9 @@ public class ServerGamer {
                     }
                 }
                 else
-                    sendMessage(new Message(301,"",""));
+                    sendMessage(new Message(MessageCommand.S_C_DisconnectFromServer,"",""));
             }break;
-            case 301:{
+            case MessageCommand.S_C_DisconnectFromServer:{
                 // исходящее сообщение об отключении
             }break;
         }
@@ -321,7 +321,7 @@ public class ServerGamer {
         }
 
         if(game != null)
-            handleMessage(new Message(150, "", ""));
+            handleMessage(new Message(MessageCommand.C_S_LeftFromTheGame, "", ""));
 
         System.err.println("Error:connect is broken. " + (isAnonim ? "Anonim" : login) + " is disconnect from server");
         login = null;

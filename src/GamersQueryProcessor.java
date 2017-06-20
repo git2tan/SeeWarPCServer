@@ -24,10 +24,10 @@ public class GamersQueryProcessor {
     }
     public void handleConnectToLobby(ServerGamer gamer){
         if (server.connectToLobby(gamer))
-            handleMessageToLobby(new Message(107, "В лобби подключился новый игрок - " + gamer.getLogin(),""));
+            handleMessageToLobby(new Message(MessageCommand.S_C_MessageToLobbyFromServer, "В лобби подключился новый игрок - " + gamer.getLogin(),""));
 
         ArrayList<String> list = server.getListOfGame();
-        gamer.handleMessage(new Message(201, list));
+        gamer.handleMessage(new Message(MessageCommand.S_C_ListOfLobbyGame, list));
     }
     public void handleDisconnectFromLobby(ServerGamer gamer){
         server.tryDisconnectFromLobby(gamer);
@@ -44,7 +44,7 @@ public class GamersQueryProcessor {
     }
     public void createGameQueryHandler(ServerGamer gamer1){
         server.createGame(gamer1);
-        handleMessageToLobby(new Message(201, server.getListOfGame()));
+        handleMessageToLobby(new Message(MessageCommand.S_C_ListOfLobbyGame, server.getListOfGame()));
     }
     public ArrayList<String> getStatisticHandler(int offset){
         return DBHandler.getInstance().getTop5WithOffset(offset);
@@ -55,13 +55,13 @@ public class GamersQueryProcessor {
     public boolean handleTryToConnectToGame(ServerGamer gamer2, int id){
         boolean answer = server.tryToConnectToGame(gamer2, id);
         if (answer)
-            handleMessageToLobby(new Message(201, server.getListOfGame()));
+            handleMessageToLobby(new Message(MessageCommand.S_C_ListOfLobbyGame, server.getListOfGame()));
         return answer;
     }
     public boolean handleTryToConnectToGameObs(ServerGamer gamer, int id){
         boolean answer = server.tryToCoonectToGameObs(gamer, id);
             if(answer)
-                handleMessageToLobby(new Message(201, server.getListOfGame()));
+                handleMessageToLobby(new Message(MessageCommand.S_C_ListOfLobbyGame, server.getListOfGame()));
 
         return answer;
     }
@@ -74,6 +74,6 @@ public class GamersQueryProcessor {
 
     public void deleteGame(Game game){
         server.deleteGame(game);
-        handleMessageToLobby(new Message(201, server.getListOfGame()));
+        handleMessageToLobby(new Message(MessageCommand.S_C_ListOfLobbyGame, server.getListOfGame()));
     }
 }

@@ -29,7 +29,7 @@ public class GamerReceiver implements Runnable{
 
                     if(!message.isEmpty())
                     {
-                        if(message.getNumberOfCommand() == 300)
+                        if(message.getNumberOfCommand() == MessageCommand.C_S_DisconnectFromServer)
                         {
                             System.out.println("ПОЛУЧИЛ СООБЩЕНИЕ ОБ ОТКЛЮЧЕНИИ ОТ: " + gamer.getLogin());
                             gamer.handleMessage(message);

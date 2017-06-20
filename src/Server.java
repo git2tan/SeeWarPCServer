@@ -75,7 +75,7 @@ public class Server {
     public boolean tryDisconnectFromLobby(ServerGamer gamer){
         boolean answer = lobby.removeGamer(gamer);
         if (answer)
-            lobby.sendMessageToLobby(new Message (107, gamer.getLogin() + " вышел из лобби",""));
+            lobby.sendMessageToLobby(new Message (MessageCommand.S_C_MessageToLobbyFromServer, gamer.getLogin() + " вышел из лобби",""));
         return answer;
     }
     public void deleteGame(Game game){

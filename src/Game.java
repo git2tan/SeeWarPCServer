@@ -24,7 +24,7 @@ public class Game {
         if (this.gamer2 == null){
             this.gamer2 = gamer2;
             gamer2.setGame(this);
-            sendMessageToObs(new Message(142, this.toString2(), ""));
+            sendMessageToObs(new Message(MessageCommand.S_C_ShowObserverActivity, this.toString2(), ""));
             return true;
         }
         else{
@@ -36,18 +36,18 @@ public class Game {
     public boolean tryToConnectObs(ServerGamer gamer){
         observers.add(gamer);
         gamer.setGame(this);
-        sendMessageToObs(new Message(142, this.toString2(), ""));
+        sendMessageToObs(new Message(MessageCommand.S_C_ShowObserverActivity, this.toString2(), ""));
         // TODO отправить актуальное состояние игровых полей если начали смотреть уже после того как игроки начали стрелять (стартанули)
         if(isGameStarted)
-            gamer.handleMessage(new Message(147, gamer1.boardToString(), gamer2.boardToString()));
+            gamer.handleMessage(new Message(MessageCommand.S_C_ToObs_ActualGameInfo, gamer1.boardToString(), gamer2.boardToString()));
         return true;
     }
 
     public void disconnectObs(ServerGamer gamer){
         observers.remove(gamer);
 
-        sendMessageToGamers(new Message(119,this.toString(),""));
-        sendMessage(new Message(140,"Obs left: " + gamer.getLogin() + "", ""));
+        sendMessageToGamers(new Message(MessageCommand.S_C_NewGameInfo,this.toString(),""));
+        sendMessage(new Message(MessageCommand.S_C_MessageToLobbyAboutCoonect,"Obs left: " + gamer.getLogin() + "", ""));
     }
 
     @Override
@@ -93,10 +93,10 @@ public class Game {
 
     public void startGame(){
         isGameStarted = true;
-        gamer1.handleMessage(new Message(123,"", ""));
-        gamer2.handleMessage(new Message(124,"",""));
+        gamer1.handleMessage(new Message(MessageCommand.S_C_ToHostGamerStartTheGame,"", ""));
+        gamer2.handleMessage(new Message(MessageCommand.S_C_ToGamer2StartTheGame,"",""));
         for(ServerGamer gamer :observers)
-            gamer.handleMessage(new Message(125,"",""));
+            gamer.handleMessage(new Message(MessageCommand.S_C_AllowObserveTheGame,"",""));
     }
 
     public void shot(Message message, ServerGamer gamer){
@@ -106,54 +106,54 @@ public class Game {
         if(gamer.getLogin() == gamer1.getLogin()){
             if(gamer2.isHit(x, y)){
                 // если попал
-                gamer1.handleMessage(new Message(127, "" + x,"" + y));  //посылаем ему обратно что он попал
-                gamer2.handleMessage(new Message (129, "" + x,"" + y)); //посылаем второму что по нему попали
-                sendMessageToObs(new Message(143, gamer1.getLogin(),"" + x + "" + y)); // геймер1 попал по полю с координатами
+                gamer1.handleMessage(new Message(MessageCommand.S_C_YouHitToCoord, "" + x,"" + y));  //посылаем ему обратно что он попал
+                gamer2.handleMessage(new Message (MessageCommand.S_C_OpponentHitToYou, "" + x,"" + y)); //посылаем второму что по нему попали
+                sendMessageToObs(new Message(MessageCommand.S_C_LoginFireToCoordAndHit, gamer1.getLogin(),"" + x + "" + y)); // геймер1 попал по полю с координатами
 
                 if(!gamer2.isShipNotDestroyed(x,y)) {
-                    gamer1.handleMessage(new Message(131, "" + x, "" + y));  // послать сообщение об уничтожении корабля
+                    gamer1.handleMessage(new Message(MessageCommand.S_C_YouDestroyTheShipByCoord, "" + x, "" + y));  // послать сообщение об уничтожении корабля
                     gamer2.setDestroyedShipAt(x,y);
-                    gamer2.handleMessage(new Message(132,"" + x, "" + y));
-                    sendMessageToObs(new Message(145, gamer1.getLogin(),"" + x + "" + y)); // геймер1 убил корабль с координатами
+                    gamer2.handleMessage(new Message(MessageCommand.S_C_YourShipByCoordIsDestroyed,"" + x, "" + y));
+                    sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginDestroyShipByCoord, gamer1.getLogin(),"" + x + "" + y)); // геймер1 убил корабль с координатами
                 }
 
                 if(!gamer2.haveShip()){
                     // послать сообщение о выигрише и проигрыше соответственно
-                    gamer2.handleMessage(new Message(134,"",""));   // проиграл
-                    gamer1.handleMessage(new Message(133,"",""));   // выиграл
-                    sendMessageToObs(new Message(146, gamer1.getLogin(),""));
+                    gamer2.handleMessage(new Message(MessageCommand.S_C_YouLose,"",""));   // проиграл
+                    gamer1.handleMessage(new Message(MessageCommand.S_C_YouWin,"",""));   // выиграл
+                    sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginWin, gamer1.getLogin(),""));
                 }
             }
             else{
-                gamer1.handleMessage(new Message(128, "" + x,"" + y));
-                gamer2.handleMessage(new Message (130, "" + x,"" + y));
-                sendMessageToObs(new Message(144, gamer1.getLogin(),"" + x + "" + y)); // геймер1 промазал по полю с координатами
+                gamer1.handleMessage(new Message(MessageCommand.S_C_YouMissToCoord, "" + x,"" + y));
+                gamer2.handleMessage(new Message (MessageCommand.S_C_OpponentMissToYou, "" + x,"" + y));
+                sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginFireToCoordAndMiss, gamer1.getLogin(),"" + x + "" + y)); // геймер1 промазал по полю с координатами
             }
         }
         else if(gamer.getLogin() == gamer2.getLogin()){
             if(gamer1.isHit(x, y)){
-                gamer2.handleMessage(new Message(127, "" + x,"" + y));
-                gamer1.handleMessage(new Message (129, "" + x,"" + y));
-                sendMessageToObs(new Message(143, gamer2.getLogin(),"" + x + "" + y)); // геймер1 попал по полю с координатами
+                gamer2.handleMessage(new Message(MessageCommand.S_C_YouHitToCoord, "" + x,"" + y));
+                gamer1.handleMessage(new Message (MessageCommand.S_C_OpponentHitToYou, "" + x,"" + y));
+                sendMessageToObs(new Message(MessageCommand.S_C_LoginFireToCoordAndHit, gamer2.getLogin(),"" + x + "" + y)); // геймер1 попал по полю с координатами
 
                 if(!gamer1.isShipNotDestroyed(x,y)) {
-                    gamer2.handleMessage(new Message(131, "" + x, "" + y));  // послать сообщение об уничтожении корабля
+                    gamer2.handleMessage(new Message(MessageCommand.S_C_YouDestroyTheShipByCoord, "" + x, "" + y));  // послать сообщение об уничтожении корабля
                     gamer1.setDestroyedShipAt(x,y);
-                    gamer1.handleMessage(new Message(132,"" + x, "" + y));
-                    sendMessageToObs(new Message(145, gamer2.getLogin(),"" + x + "" + y)); // геймер1 убил корабль с координатами
+                    gamer1.handleMessage(new Message(MessageCommand.S_C_YourShipByCoordIsDestroyed,"" + x, "" + y));
+                    sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginDestroyShipByCoord, gamer2.getLogin(),"" + x + "" + y)); // геймер1 убил корабль с координатами
                 }
 
                 if(!gamer1.haveShip()){
                     // послать сообщение о выигрише и проигрыше соответственно
-                    gamer1.handleMessage(new Message(134,"",""));   // проиграл
-                    gamer2.handleMessage(new Message(133,"",""));   // выиграл
-                    sendMessageToObs(new Message(146, gamer2.getLogin(),""));
+                    gamer1.handleMessage(new Message(MessageCommand.S_C_YouLose,"",""));   // проиграл
+                    gamer2.handleMessage(new Message(MessageCommand.S_C_YouWin,"",""));   // выиграл
+                    sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginWin, gamer2.getLogin(),""));
                 }
             }
             else{
-                gamer2.handleMessage(new Message(128, "" + x,"" + y));
-                gamer1.handleMessage(new Message (130, "" + x,"" + y));
-                sendMessageToObs(new Message(144, gamer2.getLogin(),"" + x + "" + y)); // геймер1 промазал по полю с координатами
+                gamer2.handleMessage(new Message(MessageCommand.S_C_YouMissToCoord, "" + x,"" + y));
+                gamer1.handleMessage(new Message (MessageCommand.S_C_OpponentMissToYou, "" + x,"" + y));
+                sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginFireToCoordAndMiss, gamer2.getLogin(),"" + x + "" + y)); // геймер1 промазал по полю с координатами
             }
         }
     }
@@ -177,38 +177,38 @@ public class Game {
     public void handleSurrenderMessage(ServerGamer gamer){
         if(gamer.getLogin().equals(gamer1.getLogin())){
             //пожелал сдаться первый игрок
-            gamer1.handleMessage(new Message(134,"",""));   // проиграл
+            gamer1.handleMessage(new Message(MessageCommand.S_C_YouLose,"",""));   // проиграл
             gamer1.setLoser();
-            gamer2.handleMessage(new Message(133,"",""));   // выиграл
+            gamer2.handleMessage(new Message(MessageCommand.S_C_YouWin,"",""));   // выиграл
             gamer2.setWinner();
-            sendMessageToObs(new Message(146, gamer2.getLogin(),""));
+            sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginWin, gamer2.getLogin(),""));
         }
         else if(gamer.getLogin().equals(gamer2.getLogin())){
             //пожелал сдаться второй игрок
-            gamer2.handleMessage(new Message(134,"",""));   // проиграл
+            gamer2.handleMessage(new Message(MessageCommand.S_C_YouLose,"",""));   // проиграл
             gamer2.setLoser();
-            gamer1.handleMessage(new Message(133,"",""));   // выиграл
+            gamer1.handleMessage(new Message(MessageCommand.S_C_YouWin,"",""));   // выиграл
             gamer1.setWinner();
-            sendMessageToObs(new Message(146, gamer1.getLogin(),""));
+            sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginWin, gamer1.getLogin(),""));
         }
     }
     public void handleDisconnect(ServerGamer gamer){
         if(isGameStarted){
             if(gamer.getLogin().equals(gamer1.getLogin())){
                 //пожелал сдаться первый игрок
-                gamer1.handleMessage(new Message(134,"",""));   // проиграл
+                gamer1.handleMessage(new Message(MessageCommand.S_C_YouLose,"",""));   // проиграл
                 gamer1.setLoser();
-                gamer2.handleMessage(new Message(133,"",""));   // выиграл
+                gamer2.handleMessage(new Message(MessageCommand.S_C_YouWin,"",""));   // выиграл
                 gamer2.setWinner();
-                sendMessageToObs(new Message(146, gamer2.getLogin(),""));
+                sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginWin, gamer2.getLogin(),""));
             }
             else if(gamer.getLogin().equals(gamer2.getLogin())){
                 //пожелал сдаться второй игрок
-                gamer2.handleMessage(new Message(134,"",""));   // проиграл
+                gamer2.handleMessage(new Message(MessageCommand.S_C_YouLose,"",""));   // проиграл
                 gamer2.setWinner();
-                gamer1.handleMessage(new Message(133,"",""));   // выиграл
+                gamer1.handleMessage(new Message(MessageCommand.S_C_YouWin,"",""));   // выиграл
                 gamer1.setLoser();
-                sendMessageToObs(new Message(146, gamer1.getLogin(),""));
+                sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginWin, gamer1.getLogin(),""));
             }
         }
         else{
@@ -220,15 +220,15 @@ public class Game {
         if (gamer2 != null){
             if(gamer.getLogin().equals(gamer2.getLogin())){
                 gamer2 = null;
-                gamer1.handleMessage(new Message(119, this.toString2(),""));
-                sendMessageToObs(new Message(142, this.toString2(), ""));
+                gamer1.handleMessage(new Message(MessageCommand.S_C_NewGameInfo, this.toString2(),""));
+                sendMessageToObs(new Message(MessageCommand.S_C_ShowObserverActivity, this.toString2(), ""));
             }
             else if (gamer.getLogin().equals(gamer1.getLogin())){
-                sendMessage(new Message(151,"",""));
+                sendMessage(new Message(MessageCommand.S_C_HostLeftTheGame,"",""));
             }
         }
         else if (gamer.getLogin().equals(gamer1.getLogin())){
-            sendMessage(new Message(151,"",""));
+            sendMessage(new Message(MessageCommand.S_C_HostLeftTheGame,"",""));
         }
         else
             System.err.println("Что-то пошло не так! Сюда мы не должны попадать...");
