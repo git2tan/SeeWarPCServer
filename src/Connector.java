@@ -7,14 +7,15 @@ import java.net.Socket;
  */
 public class Connector implements Runnable {
     GamersQueryProcessor processor;
-
-    public Connector(GamersQueryProcessor processor){
+    int port;
+    public Connector(GamersQueryProcessor processor, int port){
         this.processor = processor;
+        this.port = port;
     }
 
     @Override
     public void run() {
-        try (ServerSocket serverSocket = new ServerSocket(4444)) {
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server is :" + serverSocket.getLocalSocketAddress());
             while(true){
                 Socket tmpSocket = null;

@@ -10,9 +10,9 @@ public class Server {
     private Lobby lobby;
     private ServerGames allGames;
 
-    public Server(){
+    public Server(int port){
         processor = new GamersQueryProcessor(this);
-        connector = new Connector(processor);
+        connector = new Connector(processor, port);
         connectedList = new ArrayList<String>();
         lobby = new Lobby();
         allGames = new ServerGames();
