@@ -376,7 +376,7 @@ public class ServerGamer {
             cx--;
             if(cx < 0)
                 break;
-            if(board[cx][y] == 0)
+            if(board[cx][y] == 0 || board[cx][y] == 3)
                 break;
 
             if(board[cx][y] == 1)
@@ -387,7 +387,7 @@ public class ServerGamer {
             cx++;
             if(cx > 9)
                 break;
-            if(board[cx][y] == 0)
+            if(board[cx][y] == 0 || board[cx][y] == 3)
                 break;
 
             if(board[cx][y] == 1)
@@ -398,7 +398,7 @@ public class ServerGamer {
             cy--;
             if(cy < 0)
                 break;
-            if(board[x][cy] == 0)
+            if(board[x][cy] == 0 || board[x][cy] == 3)
                 break;
 
             if(board[x][cy] == 1)
@@ -409,7 +409,7 @@ public class ServerGamer {
             cy++;
             if(cy > 9)
                 break;
-            if(board[x][cy] == 0)
+            if(board[x][cy] == 0 || board[x][cy] == 3)
                 break;
 
             if(board[x][cy] == 1)
