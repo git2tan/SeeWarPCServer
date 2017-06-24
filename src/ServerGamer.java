@@ -305,7 +305,7 @@ public class ServerGamer {
                     }
                 }
                 else
-                    sendMessage(new Message(MessageCommand.S_C_DisconnectFromServer,"",""));
+                    sendMessage(new Message(MessageCommand.S_C_SystemMessageStopTheThread,"",""));
             }break;
             case MessageCommand.S_C_DisconnectFromServer:{
                 // исходящее сообщение об отключении
@@ -324,6 +324,7 @@ public class ServerGamer {
             handleMessage(new Message(MessageCommand.C_S_LeftFromTheGame, "", ""));
 
         System.err.println("Error:connect is broken. " + (isAnonim ? "Anonim" : login) + " is disconnect from server");
+        processor.handleDisconnectFromLobby(this);
         login = null;
         password = null;
         isAnonim = true;
@@ -530,7 +531,8 @@ public class ServerGamer {
         else
         {
             ServerGamer tmp = (ServerGamer)obj;
-            if(tmp.getLogin().equals(login))
+            String login1 = tmp.getLogin();
+            if(login1.equals(login))
                 return true;
             else
                 return false;
