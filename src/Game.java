@@ -9,6 +9,7 @@ public class Game {
     private ServerGamer gamer2;
     private ArrayList<ServerGamer> observers;
     private boolean isGameStarted;
+    private boolean isClosed;
 
 
     public Game(int id, ServerGamer gamer1){
@@ -18,6 +19,7 @@ public class Game {
         gamer2 = null;
         gamer1.setGame(this);
         isGameStarted = false;
+        isClosed = false;
     }
 
     public boolean tryToConnect(ServerGamer gamer2){
@@ -119,9 +121,14 @@ public class Game {
 
                 if(!gamer2.haveShip()){
                     // послать сообщение о выигрише и проигрыше соответственно
-                    gamer2.handleMessage(new Message(MessageCommand.S_C_YouLose,"",""));   // проиграл
-                    gamer1.handleMessage(new Message(MessageCommand.S_C_YouWin,"",""));   // выиграл
-                    sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginWin, gamer1.getLogin(),""));
+                    if (!isClosed) {
+                        isClosed = true;
+                        gamer2.handleMessage(new Message(MessageCommand.S_C_YouLose, "", ""));   // проиграл
+                        gamer2.setLoser();
+                        gamer1.handleMessage(new Message(MessageCommand.S_C_YouWin, "", ""));   // выиграл
+                        gamer1.setWinner();
+                        sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginWin, gamer1.getLogin(), ""));
+                    }
                 }
             }
             else{
@@ -145,9 +152,14 @@ public class Game {
 
                 if(!gamer1.haveShip()){
                     // послать сообщение о выигрише и проигрыше соответственно
-                    gamer1.handleMessage(new Message(MessageCommand.S_C_YouLose,"",""));   // проиграл
-                    gamer2.handleMessage(new Message(MessageCommand.S_C_YouWin,"",""));   // выиграл
-                    sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginWin, gamer2.getLogin(),""));
+                    if (!isClosed) {
+                        isClosed = true;
+                        gamer1.handleMessage(new Message(MessageCommand.S_C_YouLose, "", ""));   // проиграл
+                        gamer1.setLoser();
+                        gamer2.handleMessage(new Message(MessageCommand.S_C_YouWin, "", ""));   // выиграл
+                        gamer2.setWinner();
+                        sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginWin, gamer2.getLogin(), ""));
+                    }
                 }
             }
             else{
@@ -177,38 +189,50 @@ public class Game {
     public void handleSurrenderMessage(ServerGamer gamer){
         if(gamer.getLogin().equals(gamer1.getLogin())){
             //пожелал сдаться первый игрок
-            gamer1.handleMessage(new Message(MessageCommand.S_C_YouLose,"",""));   // проиграл
-            gamer1.setLoser();
-            gamer2.handleMessage(new Message(MessageCommand.S_C_YouWin,"",""));   // выиграл
-            gamer2.setWinner();
-            sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginWin, gamer2.getLogin(),""));
+            if (!isClosed) {
+                isClosed = true;
+                gamer1.handleMessage(new Message(MessageCommand.S_C_YouLose, "", ""));   // проиграл
+                gamer1.setLoser();
+                gamer2.handleMessage(new Message(MessageCommand.S_C_YouWin, "", ""));   // выиграл
+                gamer2.setWinner();
+                sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginWin, gamer2.getLogin(), ""));
+            }
         }
         else if(gamer.getLogin().equals(gamer2.getLogin())){
             //пожелал сдаться второй игрок
-            gamer2.handleMessage(new Message(MessageCommand.S_C_YouLose,"",""));   // проиграл
-            gamer2.setLoser();
-            gamer1.handleMessage(new Message(MessageCommand.S_C_YouWin,"",""));   // выиграл
-            gamer1.setWinner();
-            sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginWin, gamer1.getLogin(),""));
+            if (!isClosed) {
+                isClosed = true;
+                gamer2.handleMessage(new Message(MessageCommand.S_C_YouLose, "", ""));   // проиграл
+                gamer2.setLoser();
+                gamer1.handleMessage(new Message(MessageCommand.S_C_YouWin, "", ""));   // выиграл
+                gamer1.setWinner();
+                sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginWin, gamer1.getLogin(), ""));
+            }
         }
     }
     public void handleDisconnect(ServerGamer gamer){
         if(isGameStarted){
             if(gamer.getLogin().equals(gamer1.getLogin())){
                 //пожелал сдаться первый игрок
-                gamer1.handleMessage(new Message(MessageCommand.S_C_YouLose,"",""));   // проиграл
-                gamer1.setLoser();
-                gamer2.handleMessage(new Message(MessageCommand.S_C_YouWin,"",""));   // выиграл
-                gamer2.setWinner();
-                sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginWin, gamer2.getLogin(),""));
+                if (!isClosed) {
+                    isClosed = true;
+                    gamer1.handleMessage(new Message(MessageCommand.S_C_YouLose, "", ""));   // проиграл
+                    gamer1.setLoser();
+                    gamer2.handleMessage(new Message(MessageCommand.S_C_YouWin, "", ""));   // выиграл
+                    gamer2.setWinner();
+                    sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginWin, gamer2.getLogin(), ""));
+                }
             }
             else if(gamer.getLogin().equals(gamer2.getLogin())){
                 //пожелал сдаться второй игрок
-                gamer2.handleMessage(new Message(MessageCommand.S_C_YouLose,"",""));   // проиграл
-                gamer2.setWinner();
-                gamer1.handleMessage(new Message(MessageCommand.S_C_YouWin,"",""));   // выиграл
-                gamer1.setLoser();
-                sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginWin, gamer1.getLogin(),""));
+                if (!isClosed) {
+                    isClosed = true;
+                    gamer2.handleMessage(new Message(MessageCommand.S_C_YouLose, "", ""));   // проиграл
+                    gamer2.setWinner();
+                    gamer1.handleMessage(new Message(MessageCommand.S_C_YouWin, "", ""));   // выиграл
+                    gamer1.setLoser();
+                    sendMessageToObs(new Message(MessageCommand.S_C_ToObs_LoginWin, gamer1.getLogin(), ""));
+                }
             }
         }
         else{

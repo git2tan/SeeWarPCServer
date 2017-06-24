@@ -190,12 +190,12 @@ public class ServerGamer {
             } break;
             case MessageCommand.S_C_YouWin:{
                 // обработать выигрыш
-                setWinner();
+                //setWinner();
                 sendMessage(message);
             }break;
             case MessageCommand.S_C_YouLose:{
                 //обработать проигрыш
-                setLoser();
+                //setLoser();
                 sendMessage(message);
             }break;
             case MessageCommand.C_S_NeedStatisticFromNumber:{

@@ -78,7 +78,7 @@ public class DBHandler {
             ResultSet result = statement.executeQuery(query);
 
             while(result.next()){
-                String one = result.getString("Login")+ "   " + result.getString("Win") + " побед";
+                String one = result.getString("Login")+ "   " + result.getString("Win") + " wins";
                 System.out.println("Добавил с писок результатов строку: " + "\"" + one + "\"");
                 resultString.add(one);
             }
@@ -95,7 +95,7 @@ public class DBHandler {
             ResultSet result = statement.executeQuery(query);
 
             while(result.next()){
-                String one = result.getString("Login")+ " " + result.getString("Win") + " побед из " + result.getString("Games") + " игр";
+                String one = result.getString("Login")+ " " + result.getString("Win") + " wins from " + result.getString("Games") + " games";
                 System.out.println("Добавил с писок результатов строку: " + "\"" + one + "\"");
                 resultString.add(one);
             }

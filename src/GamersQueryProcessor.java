@@ -24,7 +24,7 @@ public class GamersQueryProcessor {
     }
     public void handleConnectToLobby(ServerGamer gamer){
         if (server.connectToLobby(gamer))
-            handleMessageToLobby(new Message(MessageCommand.S_C_MessageToLobbyFromServer, "В лобби подключился новый игрок - " + gamer.getLogin(),""));
+            handleMessageToLobby(new Message(MessageCommand.S_C_MessageToLobbyFromServer, "New gamer has connected to lobby - " + gamer.getLogin(),""));
 
         ArrayList<String> list = server.getListOfGame();
         gamer.handleMessage(new Message(MessageCommand.S_C_ListOfLobbyGame, list));
